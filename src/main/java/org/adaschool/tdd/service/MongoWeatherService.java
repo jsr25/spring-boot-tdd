@@ -24,7 +24,7 @@ public class MongoWeatherService
     @Override
     public WeatherReport report( WeatherReportDto weatherReportDto )
     {
-        return null;
+        return repository.save(new WeatherReport(weatherReportDto));
     }
 
     @Override
