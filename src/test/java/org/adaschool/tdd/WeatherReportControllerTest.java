@@ -20,7 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,25 +43,29 @@ public class WeatherReportControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    private String baseUrl;
+
     @BeforeEach()
     public void setup() {
         weatherService = new MongoWeatherService(repository);
+
+
     }
 
+
+
     @Test
-    void weatherCreate() throws Exception {
+    void weatherCreateTest() throws Exception {
         double lat = 4.7110;
         double lng = 74.0721;
         GeoLocation location = new GeoLocation(lat, lng);
         WeatherReportDto weatherReportDto = new WeatherReportDto(location, 35f, 22f, "tester", new Date());
         WeatherReport weatherReport = new WeatherReport(weatherReportDto);
         when(repository.save(any(WeatherReport.class))).thenReturn(weatherReport);
-
-        final String baseUrl = "http://localhost:" + port + "/v1/weather";
+        baseUrl = "http://localhost:" + port + "/v1/weather";
         URI uri = new URI(baseUrl);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-COM-PERSIST", "true");
 
         HttpEntity<WeatherReportDto> request = new HttpEntity<>(weatherReportDto, headers);
 
@@ -67,4 +74,22 @@ public class WeatherReportControllerTest {
         assertEquals(HttpStatus.OK.value(), result.getStatusCodeValue());
     }
 
+    @Test
+    void weatherFindByIdTest() throws URISyntaxException {
+        String idWeather="asda185212asd123";
+        double lat = 4.7110;
+        double lng = 74.0721;
+        GeoLocation location = new GeoLocation(lat, lng);
+        WeatherReportDto weatherReportDto = new WeatherReportDto(location, 35f, 22f, "tester", new Date());
+        WeatherReport weatherReport = new WeatherReport(weatherReportDto);
+        baseUrl = "http://localhost:" + port + "/v1/weather";
+
+        when(repository.findById(any(String.class))).thenReturn(java.util.Optional.of(weatherReport));
+        URI uri = new URI(baseUrl+"/asda185212asd123");
+
+        ResponseEntity<WeatherReport> result = this.restTemplate.getForEntity(uri, WeatherReport.class);
+
+        assertEquals(HttpStatus.OK.value(), result.getStatusCodeValue());
+    }
+    
 }
