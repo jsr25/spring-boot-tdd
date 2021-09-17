@@ -7,22 +7,22 @@ import org.adaschool.tdd.repository.document.GeoLocation;
 import org.adaschool.tdd.repository.document.WeatherReport;
 import org.adaschool.tdd.service.MongoWeatherService;
 import org.adaschool.tdd.service.WeatherService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@TestInstance( TestInstance.Lifecycle.PER_CLASS )
+@ExtendWith(MockitoExtension.class)
 class MongoWeatherServiceTest
 {
     WeatherService weatherService;
@@ -30,7 +30,7 @@ class MongoWeatherServiceTest
     @Mock
     WeatherReportRepository repository;
 
-    @BeforeAll()
+    @BeforeEach()
     public void setup()
     {
         weatherService = new MongoWeatherService( repository );
@@ -68,6 +68,41 @@ class MongoWeatherServiceTest
         Assertions.assertThrows( WeatherReportNotFoundException.class, () -> {
             weatherService.findById( weatherReportId );
         } );
+    }
+
+    @Test
+    void weatherFindNearLocationTest(){
+        double lat = 4.7110;
+        double lng = 74.0721;
+        GeoLocation location = new GeoLocation( lat, lng );
+        WeatherReport weatherReport = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        WeatherReport weatherReport2 = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        List<WeatherReport> list = new ArrayList<>();
+        list.add(weatherReport);
+        list.add(weatherReport2);
+        when(weatherService.findNearLocation(weatherReport.getGeoLocation(),(float)0.0) ).thenReturn(list);
+        List<WeatherReport> result = weatherService.findNearLocation(weatherReport.getGeoLocation(),(float)0.0);
+        Assertions.assertEquals( list, result );
+    }
+
+
+    @Test
+    void weatherFindByReporter(){
+        double lat = 4.7110;
+        double lng = 74.0721;
+        GeoLocation location = new GeoLocation( lat, lng );
+        WeatherReport weatherReport = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        WeatherReport weatherReport2 = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        WeatherReport weatherReport3 = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        WeatherReport weatherReport4 = new WeatherReport( location, 35f, 22f, "tester", new Date() );
+        List<WeatherReport> list = new ArrayList<>();
+        list.add(weatherReport);
+        list.add(weatherReport2);
+        list.add(weatherReport3);
+        list.add(weatherReport4);
+        when(weatherService.findWeatherReportsByName("tester") ).thenReturn(list);
+        List<WeatherReport> result =weatherService.findWeatherReportsByName("tester");
+        Assertions.assertEquals( list, result );
     }
 
 }

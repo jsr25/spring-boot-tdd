@@ -1,5 +1,6 @@
 package org.adaschool.tdd.repository.document;
 
+import org.adaschool.tdd.controller.weather.dto.WeatherReportDto;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,8 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Document
-public class WeatherReport
-{
+public class WeatherReport {
     @Id
     String id;
 
@@ -19,13 +19,12 @@ public class WeatherReport
 
     double humidity;
 
-    @Indexed( unique = true )
+    @Indexed(unique = true)
     String reporter;
 
     Date created;
 
-    public WeatherReport( GeoLocation geoLocation, double temperature, double humidity, String reporter, Date created )
-    {
+    public WeatherReport(GeoLocation geoLocation, double temperature, double humidity, String reporter, Date created) {
         this.geoLocation = geoLocation;
         this.temperature = temperature;
         this.humidity = humidity;
@@ -33,51 +32,50 @@ public class WeatherReport
         this.created = created;
     }
 
-    public GeoLocation getGeoLocation()
-    {
+    public WeatherReport(WeatherReportDto weatherReportDto) {
+        this.geoLocation = weatherReportDto.getGeoLocation();
+        this.reporter = weatherReportDto.getReporter();
+        this.created = weatherReportDto.getCreated();
+        this.temperature = weatherReportDto.getTemperature();
+        this.humidity = weatherReportDto.getHumidity();
+    }
+
+    public GeoLocation getGeoLocation() {
         return geoLocation;
     }
 
-    public double getTemperature()
-    {
+    public double getTemperature() {
         return temperature;
     }
 
-    public double getHumidity()
-    {
+    public double getHumidity() {
         return humidity;
     }
 
-    public String getReporter()
-    {
+    public String getReporter() {
         return reporter;
     }
 
-    public Date getCreated()
-    {
+    public Date getCreated() {
         return created;
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if ( o == null || getClass() != o.getClass() )
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         WeatherReport that = (WeatherReport) o;
-        return Double.compare( that.temperature, temperature ) == 0 && Double.compare( that.humidity, humidity ) == 0
-            && Objects.equals( id, that.id ) && Objects.equals( geoLocation, that.geoLocation ) && Objects.equals(
-            reporter, that.reporter ) && Objects.equals( created, that.created );
+        return Double.compare(that.temperature, temperature) == 0 && Double.compare(that.humidity, humidity) == 0
+                && Objects.equals(id, that.id) && Objects.equals(geoLocation, that.geoLocation) && Objects.equals(
+                reporter, that.reporter) && Objects.equals(created, that.created);
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash( id, geoLocation, temperature, humidity, reporter, created );
+    public int hashCode() {
+        return Objects.hash(id, geoLocation, temperature, humidity, reporter, created);
     }
 }
